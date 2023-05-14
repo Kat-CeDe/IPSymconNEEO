@@ -322,6 +322,7 @@ class NEEORemoteDevice extends IPSModule
 		$device_type = $this->ReadPropertyString("device");
 		$this->SendDebug("NEEO Device", "type: " . $type, 0);
 		$device_config = $this->Get_Device();
+		if ($device_config == false) return;
 		$device = json_decode($device_config);
 		$macros = $device->macros;
 		$details = $device->details;
@@ -1030,66 +1031,67 @@ X
 	{
 		$command = '/v1/projects/home/rooms/' . $this->ReadPropertyString("device_roomKey") . '/devices/' . $this->ReadPropertyString("deviceKey") . '/';
 		$config = $this->SendData('GET', $command);
-		$device = json_decode($config);
-		$name = $device->name;
-		$this->SendDebug("NEEO Device:", "name: " . $name, 0);
-		$roomName = $device->roomName;
-		$this->SendDebug("NEEO Device:", "room: " . $roomName, 0);
-		$roomKey = $device->roomKey;
-		$this->SendDebug("NEEO Device:", "room key: " . $roomKey, 0);
-		$adapterDeviceId = $device->adapterDeviceId;
-		$this->SendDebug("NEEO Device:", "adapter device id: " . $adapterDeviceId, 0);
-		$details = $device->details;
-		$sourceName = $details->sourceName;
-		$this->SendDebug("NEEO Device:", "source name: " . $sourceName, 0);
-		$adapterName = $details->adapterName;
-		$this->SendDebug("NEEO Device:", "adapter name: " . $adapterName, 0);
-		$type = $details->type;
-		$this->SendDebug("NEEO Device:", "type: " . $type, 0);
-		$manufacturer = $details->manufacturer;
-		$this->SendDebug("NEEO Device:", "manufacturer: " . $manufacturer, 0);
-		$icon = $details->icon;
-		$this->SendDebug("NEEO Device:", "icon: " . $icon, 0);
-		$name = $details->name;
-		$this->SendDebug("NEEO Device:", "name: " . $name, 0);
-		$commandSets = $details->commandSets;
-		$this->SendDebug("NEEO Device:", "command sets: " . json_encode($commandSets), 0);
-		//$macros = $device->macros;
-		$switches = $device->switches;
-		if (property_exists($switches, 'Light')) {
-			$light = $switches->Light;
-			$light_name = $light->name;
-			$this->SendDebug("NEEO Device:", "light name: " . $light_name, 0);
-			$label = $light->label;
-			$this->SendDebug("NEEO Device:", "light label: " . $label, 0);
-			$light_switch_key = $light->key;
-			$this->SendDebug("NEEO Device:", "light switch key: " . $light_switch_key, 0);
-			$componentType = $light->componentType;
-			$this->SendDebug("NEEO Device:", "component type: " . $componentType, 0);
-			// $sensor = $light->sensor;
-		}
+		if (!is_bool($config)){
+			$device = json_decode($config);
+			$name = $device->name;
+			$this->SendDebug("NEEO Device:", "name: " . $name, 0);
+			$roomName = $device->roomName;
+			$this->SendDebug("NEEO Device:", "room: " . $roomName, 0);
+			$roomKey = $device->roomKey;
+			$this->SendDebug("NEEO Device:", "room key: " . $roomKey, 0);
+			$adapterDeviceId = $device->adapterDeviceId;
+			$this->SendDebug("NEEO Device:", "adapter device id: " . $adapterDeviceId, 0);
+			$details = $device->details;
+			$sourceName = $details->sourceName;
+			$this->SendDebug("NEEO Device:", "source name: " . $sourceName, 0);
+			$adapterName = $details->adapterName;
+			$this->SendDebug("NEEO Device:", "adapter name: " . $adapterName, 0);
+			$type = $details->type;
+			$this->SendDebug("NEEO Device:", "type: " . $type, 0);
+			$manufacturer = $details->manufacturer;
+			$this->SendDebug("NEEO Device:", "manufacturer: " . $manufacturer, 0);
+			$icon = $details->icon;
+			$this->SendDebug("NEEO Device:", "icon: " . $icon, 0);
+			$name = $details->name;
+			$this->SendDebug("NEEO Device:", "name: " . $name, 0);
+			$commandSets = $details->commandSets;
+			$this->SendDebug("NEEO Device:", "command sets: " . json_encode($commandSets), 0);
+			//$macros = $device->macros;
+			$switches = $device->switches;
+			if (property_exists($switches, 'Light')) {
+				$light = $switches->Light;
+				$light_name = $light->name;
+				$this->SendDebug("NEEO Device:", "light name: " . $light_name, 0);
+				$label = $light->label;
+				$this->SendDebug("NEEO Device:", "light label: " . $label, 0);
+				$light_switch_key = $light->key;
+				$this->SendDebug("NEEO Device:", "light switch key: " . $light_switch_key, 0);
+				$componentType = $light->componentType;
+				$this->SendDebug("NEEO Device:", "component type: " . $componentType, 0);
+				// $sensor = $light->sensor;
+			}
 
-		// $sensors = $device->sensors;
-		$sliders = $device->sliders;
-		if (property_exists($sliders, 'brightness')) {
-			$brightness = $sliders->brightness;
-			$slider_key = $brightness->key;
-			$this->SendDebug("NEEO Device:", "slider key: " . $slider_key, 0);
-			$slider_name = $brightness->name;
-			$this->SendDebug("NEEO Device:", "slider name: " . $slider_name, 0);
-			$slider_label = $brightness->label; // Dimmer
-			$this->SendDebug("NEEO Device:", "slider label: " . $slider_label, 0);
-			$slider_range = $brightness->range;
-			$range_min = $slider_range[0];
-			$range_max = $slider_range[1];
-			$this->SendDebug("NEEO Device:", "Range from " . $range_min . " to " . $range_max, 0);
-			$slider_unit = $brightness->unit;
-			$this->SendDebug("NEEO Device:", "unit: " . $slider_unit, 0);
-			$slider_componentType = $brightness->componentType;
-			$this->SendDebug("NEEO Device:", "component type: " . $componentType, 0);
-			// $slider_sensor = $brightness->sensor;
+			// $sensors = $device->sensors;
+			$sliders = $device->sliders;
+			if (property_exists($sliders, 'brightness')) {
+				$brightness = $sliders->brightness;
+				$slider_key = $brightness->key;
+				$this->SendDebug("NEEO Device:", "slider key: " . $slider_key, 0);
+				$slider_name = $brightness->name;
+				$this->SendDebug("NEEO Device:", "slider name: " . $slider_name, 0);
+				$slider_label = $brightness->label; // Dimmer
+				$this->SendDebug("NEEO Device:", "slider label: " . $slider_label, 0);
+				$slider_range = $brightness->range;
+				$range_min = $slider_range[0];
+				$range_max = $slider_range[1];
+				$this->SendDebug("NEEO Device:", "Range from " . $range_min . " to " . $range_max, 0);
+				$slider_unit = $brightness->unit;
+				$this->SendDebug("NEEO Device:", "unit: " . $slider_unit, 0);
+				$slider_componentType = $brightness->componentType;
+				$this->SendDebug("NEEO Device:", "component type: " . $componentType, 0);
+				// $slider_sensor = $brightness->sensor;
+			}
 		}
-
 		return $config;
 	}
 

@@ -67,7 +67,7 @@ class NEEORecipeDevice extends IPSModule
 			$roomname = urldecode($detail["roomname"]);
 			$devicename = urldecode($detail["devicename"]);
 			$uid = $recipe["uid"];
-			$recipe_ident = $this->CreateIdent($uid);
+			$recipe_ident = $this->CreateIdent(strval($uid));
 			$objectid = $this->RegisterVariableBoolean('LaunchRecipe_' . $recipe_ident, $devicename, '~Switch', $this->_getPosition());
 			$this->SendDebug("NEEO Device", "variable recipe object id : " . $objectid .  " room (" .$roomname. "), device (" .$devicename. ")", 0);
 			$this->EnableAction('LaunchRecipe_' . $recipe_ident);
@@ -144,17 +144,20 @@ class NEEORecipeDevice extends IPSModule
 	protected function WriteValues($action, $actionparameter = NULL, $device = NULL, $recipe = NULL)
 	{
 		$recipes = $this->ReadPropertyString("recipes");
-		if ($recipes != "") {
+		$this->SendDebug("NEEO recipes:", $recipes, 0);
+		if ($recipe != NULL) {
 
 			$uid = $this->GetRecipeUID($recipe);
-			$recipe_ident = $this->CreateIdent($uid);
+			$this->SendDebug("NEEO Recieve uid:", "uid " . $uid, 0);
+			$recipe_ident = $this->CreateIdent(strval($uid));
+			$this->SendDebug("NEEO Recieve ident:", "ident " . $recipe_ident, 0);
 
 			if ($action == "launch") {
 				$this->SetValue("LaunchRecipe_" . $recipe_ident, true);
 				$this->SendDebug("NEEO Recieve:", "Recipe " . $recipe . " started", 0);
 			}
 			if ($action == "poweroff") {
-				$this->SetValue("LaunchRecipe_" . $recipe_ident, false);
+				$this->SetValue("LaunchRecipe_" . $recipe_ident , false);
 				$this->SendDebug("NEEO Recieve:", "Recipe " . $recipe . " stopped", 0);
 			}
 		}
@@ -164,13 +167,13 @@ class NEEORecipeDevice extends IPSModule
 	{
 		$uid = false;
 		$recipes = $this->ReadPropertyString("recipes");
-		$recipes = json_encode($recipes);
+		$recipes = json_decode($recipes);
 		foreach ($recipes as $recipe) {
 			$detail = $recipe->detail;
 			//$roomname = urldecode($detail->roomname);
 			$devicename = urldecode($detail->devicename);
 			if ($recipe_name == $devicename)
-				$uid = $recipe["uid"];
+				$uid = $recipe->uid;
 		}
 		return $uid;
 	}
